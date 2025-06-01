@@ -1,69 +1,160 @@
-You Need A Windows Server 2022 or 2025 with HyperV to get work
-1. setup ubuntu and redis
+# Economy Simulator Setup Guide
 
-go to powershell as administrator, then do ```wsl --install``` if you get erorrs enable "Windows Subsystem For Linux" and "Windows Virtual Machine" in the windows features.
+This guide will walk you through setting up Economy Simulator (a 2016-style Roblox clone).
 
-Once it's done, restart your computer then ubuntu will open, let it install. itll ask for a uixd name enter a name such as ecs or anythng. then a password. 
+---
 
-Do ```sudo apt update``` then after its done do ```sudo apt install redis``` and press y when it asks, when its done do ```redis-server``` now keep this open.
+## ✅ Requirements
 
-2. get apps
+* Windows Server 2022 or 2025
+* Hyper-V enabled
 
-node.js: ```https://nodejs.org/dist/v18.16.1/node-v18.16.1-x64.msi```
+---
 
-postgreSQL: ```https://sbp.enterprisedb.com/getfile.jsp?fileid=1258627```
+## 1. Install Ubuntu & Redis (via WSL)
 
-Dotnet 6: ```https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/sdk-6.0.412-windows-x64-installer```
+1. Open PowerShell as Administrator and run:
 
-Go lang: ```https://go.dev/dl/go1.20.6.windows-amd64.msi```
+   ```bash
+   wsl --install
+   ```
 
-3. install
+   > If errors occur, enable the following in "Windows Features":
+   >
+   > * Windows Subsystem for Linux
+   > * Windows Virtual Machine Platform
 
-Press next until it asks for a password, make sure you remember this. then keep pressing next, wait for it to install. Then install node.js then dotnet 6 then go lang.
+2. Restart your PC. Ubuntu should open automatically.
 
-4. setting up 
+3. Set up a UNIX username (e.g., `Admin`) and password.
 
-go to ```services/api``` and make a file named ```config.json``` and paste this code into it
-```
+4. Run:
+
+   ```bash
+   sudo apt update
+   sudo apt install redis
+   redis-server
+   ```
+
+   > Keep the Redis server running in this terminal.
+
+---
+
+## 2. Download Required Apps
+
+| App         | Version / Link                                                                                             |
+| ----------- | ---------------------------------------------------------------------------------------------------------- |
+| Node.js     | [v18.16.1](https://nodejs.org/dist/v18.16.1/node-v18.16.1-x64.msi)                                         |
+| PostgreSQL  | [Download](https://sbp.enterprisedb.com/getfile.jsp?fileid=1258627)                                        |
+| .NET 6 SDK  | [Download](https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/sdk-6.0.412-windows-x64-installer) |
+| Go (Golang) | [v1.20.6](https://go.dev/dl/go1.20.6.windows-amd64.msi)                                                    |
+
+Install in this order:
+
+1. PostgreSQL (set a memorable password)
+2. Node.js
+3. .NET 6
+4. Golang
+
+---
+
+## 3. Initial Configuration
+
+### PostgreSQL Connection
+
+In `services/api/config.json`, paste:
+
+```json
 {
-    "knex": {
-	"client": "pg",
-        "connection": {
-        "host": "127.0.0.1",
-        "user": "postgres",
-        "password": "password",
-        "database": "postgres"
-        }
+  "knex": {
+    "client": "pg",
+    "connection": {
+      "host": "127.0.0.1",
+      "user": "postgres",
+      "password": "YOUR_PASSWORD_HERE",
+      "database": "YOUR_DATABASE_NAME_HERE"
     }
+  }
 }
 ```
 
-now go to the command in the ```services/api``` folder and paste this ```npm i``` which installs node modules, then do npx knex migrate:latest which installs the database tables and shit.
+Run:
 
-now you have to go to ```services/Roblox/Roblox.Website``` open the appsettings.example.json file, and rename to appsettings.json and then go into it. go to line 37 and change the line ```    "OwnerUserId": "3",``` to ```    "OwnerUserId": "1",```
+```bash
+cd services/api
+npm i
+npx knex migrate:latest
+```
 
-go to line 26 now, and change the line ```"Postgres": "Host=127.0.0.1; Database=economysimulator; Password=test; Username=postgres; Maximum Pool Size=20",``` to 
+---
 
-``` "Postgres": "Host=127.0.0.1; Database=postgres; Password=password; Username=postgres; Maximum Pool Size=20",```
+## 4. Website Setup
 
-Now press ```ctrl + h``` and change C:\\Users\\mark\\Desktop\\ to C:\\Users\\yourusername\\Downloads\\``` FOR EVERY SINGLE ONE, MAKE SURE THE FOLDER IS NAMED ECS AND IN DOWNLOADS
+1. Go to `services/Roblox/Roblox.Website`
 
-now appsettings are done.
+2. Rename `appsettings.example.json` to `appsettings.json`
 
-Go into ```services/api``` create a folder named ```storage``` inside that folder make one named ```asset``` then go to ```services/api/public/images``` make a folder named ```thumbnails``` and ```group```
+3. Edit:
 
-go to ```services/Roblox/Roblox.Website``` and in command prompt do ```dotnet run```
+   * Line 37: `"OwnerUserId": "1"`
+   * Line 26:
 
-go to ```services/admin``` and run ```npm i``` and ```npm run build``` in a command.
+     ```json
+     "Postgres": "Host=127.0.0.1; Database=postgres; Password=password; Username=postgres; Maximum Pool Size=20",
+     ```
 
-go to ```services/2016-roblox-main``` and create a file named ```config.json```
+4. Press `Ctrl + H` and replace:
 
-paste this into it
+   ```
+   C:\\Users\\mark\\Desktop\\
+   ```
+
+   with:
+
+   ```
+   C:\\Users\\<YourUsername>\\Downloads\\
+   ```
+
+   > Make sure the folder is named `ECS` and is in Downloads.
+
+5. Folder setup:
 
 ```
+services/api/storage/asset
+services/api/public/images/thumbnails
+services/api/public/images/group
+```
+
+6. Run:
+
+```bash
+cd services/Roblox/Roblox.Website
+ dotnet run
+```
+
+---
+
+## 5. Admin Panel Setup
+
+```bash
+cd services/admin
+npm i
+npm run build
+```
+
+---
+
+## 6. Frontend Setup
+
+1. Go to `services/2016-roblox-main`
+2. Create `config.json`:
+
+```json
 {
   "serverRuntimeConfig": {
-    "backend": {"csrfKey":"g0qiiDZw7jM2l54+7qsuRaymx6nBGdCKT9Kc0bqJB3aZ26rSsPMXfg8uWfUBtTqWenDVy+AQS1jkdrgvUwVSsw=="}
+    "backend": {
+      "csrfKey": "g0qiiDZw7jM2l54+7qsuRaymx6nBGdCKT9Kc0bqJB3aZ26rSsPMXfg8uWfUBtTqWenDVy+AQS1jkdrgvUwVSsw=="
+    }
   },
   "publicRuntimeConfig": {
     "backend": {
@@ -92,57 +183,108 @@ paste this into it
 }
 ```
 
-replacing your.domain with your domain.
+Replace `your.domain` with your actual domain.
 
-now in a command in the same folder do ```npm i``` and ```npm run build``` then ```npm run start```
+Run:
 
-now go to ```services/AssetValidationServiceV2``` and in command do ```go run main.go``` 
-
-now go to ```services/RCCService``` and in command do ```RCCService.exe -console -placeid:1818```
-
-now go to ```services/game-server``` and make a file named config.json in the file paste this
+```bash
+npm i
+npm run build
+npm run start
 ```
+
+---
+
+## 7. Asset Validation & Game Server
+
+### Asset Validation:
+
+```bash
+cd services/AssetValidationServiceV2
+go run main.go
+```
+
+### RCCService:
+
+```bash
+cd services/RCCService
+RCCService.exe -console -placeid:1818
+```
+
+### Game Server Setup:
+
+1. `services/game-server/config.json`:
+
+```json
 {
-    "rcc": "C:\\Users\\yourusername\\Downloads\\ECS\\services\\RCCService",
-    "authorization": "90WGEGNJGWHIWGOI31900H9GIOGI",
-    "baseUrl": "http://localhost:5000",
-    "rccPort": 64989,
-    "port": 3040,
-    "websiteBotAuth": "UW8U8TU9W9R8RHGRJOGWGOINOOWGNWRNJWWNRJ",
-    "thumbnailWebsocketPort": 3189,
-    "dockerDisabled": true
+  "rcc": "C:\\Users\\<YourUsername>\\Downloads\\ECS\\services\\RCCService",
+  "authorization": "90WGEGNJGWHIWGOI31900H9GIOGI",
+  "baseUrl": "http://localhost:5000",
+  "rccPort": 64989,
+  "port": 3040,
+  "websiteBotAuth": "UW8U8TU9W9R8RHGRJOGWGOINOOWGNWRNJWWNRJ",
+  "thumbnailWebsocketPort": 3189,
+  "dockerDisabled": true
 }
 ```
 
-now this gets a little complicated, go into ```services/game-server/scripts```
+2. Replace `economy-simulator.org` with your domain in all files inside:
 
+   * `services/game-server/scripts/gameserver.lua`
+   * `scripts/player/*`
+   * `scripts/asset/*`
 
-in gameserver.lua press ```ctrl + h``` and replace ```economy-simulator.org``` with your domain, then go back to scripts, go into ```player``` folder and each file do the replacing, then in asset folders files. make sure to not replace the http and https
+3. Run:
 
-now go back into game-server and run ```npm i``` ```npm run build``` and ```npm run start```
+```bash
+npm i
+npm run build
+npm run start
+```
 
-step 6. cloudflare tunneling
+---
 
-Ok, so we got the whole site setup, exit out of all the cmd tabs, and go to https://cloudflare.com and sign up, add your domain onto the site. 
+## 8. Cloudflare Tunnel Setup
 
-then go into the domain, and on the side bar press ```traffic``` then press ```cloudflare tunnel``` then launch zero trust dashboard sign up for the free option if it asks you to do that.
+1. Register at [Cloudflare](https://cloudflare.com), add your domain
+2. Go to: **Traffic > Cloudflare Tunnel** > Launch Zero Trust Dashboard
+3. Go to **Access > Tunnels**, create one
+4. Download Cloudflared: [Download](https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-windows-amd64.msi)
+5. Run PowerShell as admin and execute the command shown on Cloudflare after tunnel creation
+6. Setup hostname:
 
-then press your email.
+   * Type: `HTTP`
+   * URL: `localhost:5000`
+   * Domain: your custom domain
 
-on the sidebar press ```access``` then ```tunnels``` then create a tunnel, name it and press save tunnel.
+---
 
-then download https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-windows-amd64.msi and run the power shell as administrator.
+## 9. Final Setup
 
-it says ```run the following command``` copy that and paste it into the powershell and scroll down on cloudflare wait for connectors to show your connected and press next.
+1. Go to `services` folder
+2. Run:
 
-on domain put your domain and type put http and url put ```localhost:5000``` and press save hostname.
+```bash
+runall.bat
+```
 
-Step 7. 
+3. Go to your site and register an account. This will be ID 1 (admin).
 
-congrats site is setup go into ```/services``` on the source and run ```runall.bat``` and then when its all done go to your site, sign up the ROBLOX account, make sure its ID 1 and is all caps, then go to https://your.domain/admin and go to create player, put id 2 and name UGC and a random password, then go to the user on admin panel and nullify password.
+4. Go to `https://your.domain/admin`, create a new player:
 
-now go back to create and id 12 name BadDecisions make sure its a hard pass.
+   * ID: 2
+   * Username: UGC
+   * Password: anything
+   * Then nullify the password for safety.
 
-now you can sign up.
+5. Create another user:
 
-congrats you setup the site
+   * ID: 12
+   * Username: BadDecisions
+   * Use a secure password.
+
+---
+
+## ✅ Done!
+
+You're now running your own 2016-style Roblox site!
