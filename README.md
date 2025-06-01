@@ -144,6 +144,4 @@ now go back to create and id 12 name BadDecisions make sure its a hard pass.
 
 now you can sign up.
 
-congrats site made
-
-- Made by Deadly
+congrats you setup the site
