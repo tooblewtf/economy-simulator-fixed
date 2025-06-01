@@ -1,3 +1,4 @@
+You Need A Windows Server 2022 or 2025 with HyperV to get work
 1. setup ubuntu and redis
 
 go to powershell as administrator, then do ```wsl --install``` if you get erorrs enable "Windows Subsystem For Linux" and "Windows Virtual Machine" in the windows features.
