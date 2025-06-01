@@ -1,6 +1,6 @@
 # Economy Simulator Setup Guide
 
-This guide will walk you through setting up Economy Simulator (a 2016-style Roblox clone).
+This guide will walk you through setting up Economy Simulator (a SKIDDED 2016 ROBLOX REVIVAL ).
 
 ---
 
@@ -62,6 +62,7 @@ Install in this order:
 
 ### PostgreSQL Connection
 
+/// create if doesent exist
 In `services/api/config.json`, paste:
 
 ```json
@@ -93,6 +94,8 @@ npx knex migrate:latest
 1. Go to `services/Roblox/Roblox.Website`
 
 2. Rename `appsettings.example.json` to `appsettings.json`
+
+/// create if doesent exist
 
 3. Edit:
 
