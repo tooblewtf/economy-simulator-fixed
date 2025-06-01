@@ -1,5 +1,7 @@
 # Economy Simulator Setup Guide
 
+PLEASE DO NOT HOST FOR PUBLIC.
+
 This guide will walk you through setting up Economy Simulator (a SKIDDED 2016 ROBLOX REVIVAL ).
 
 ---
@@ -290,4 +292,4 @@ runall.bat
 
 ## ✅ Done!
 
-You're now running your own 2016-style Roblox site!
+You're now running your own ECS.
